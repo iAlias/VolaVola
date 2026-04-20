@@ -325,6 +325,31 @@
     }
 
     /* ===========================
+       DEMO BADGE
+    =========================== */
+    #demo-badge {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 600;
+      background: var(--surface);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 8px 14px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      box-shadow: var(--shadow);
+      white-space: nowrap;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    #demo-badge.visible { display: flex; }
+    #demo-badge .demo-icon { color: var(--accent); flex-shrink: 0; }
+    #demo-badge strong { color: var(--accent); font-weight: 600; }
+
+    /* ===========================
        EMPTY STATE
     =========================== */
     #empty-state {
@@ -985,6 +1010,16 @@
       <button class="err-retry" id="retry-btn">Riprova</button>
     </div>
 
+    <!-- Demo mode badge -->
+    <div id="demo-badge" role="status" aria-live="polite">
+      <svg class="demo-icon" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span><strong>Modalità Demo</strong> – API non disponibile, dati simulati</span>
+    </div>
+
     <!-- Empty state -->
     <div id="empty-state" aria-live="polite">
       <div class="empty-icon" aria-hidden="true">✈️</div>
@@ -1190,6 +1225,7 @@ const STATE = {
   },
   isLoading: true,
   hasError: false,
+  isMockData: false,
   lastUpdate: null,
   updateTimer: null,
   mapTileLayer: null,
@@ -1368,7 +1404,11 @@ async function fetchFlights() {
     }
 
     STATE.hasError = false;
+    STATE.isMockData = false;
     STATE.lastUpdate = new Date();
+    // Clear any UI state left over from a previous failed cycle
+    showDemoBadge(false);
+    showError(false);
 
   } catch (err) {
     if (err.name === 'AbortError') {
@@ -1381,9 +1421,11 @@ async function fetchFlights() {
     if (STATE.allFlights.length === 0) {
       STATE.allFlights = generateMockFlights();
     }
-    // Se abbiamo già dei dati, teniamoli e mostriamo solo il banner
-    STATE.hasError = true;
-    showError(true);
+    STATE.isMockData = true;
+    STATE.hasError = false;
+    STATE.lastUpdate = new Date();
+    showDemoBadge(true);
+    showError(false);
   } finally {
     setStatusUpdating(false);
     STATE.isLoading = false;
@@ -2032,6 +2074,10 @@ function hideLoading() {
 
 function showError(show) {
   document.getElementById('error-banner').classList.toggle('visible', show);
+}
+
+function showDemoBadge(show) {
+  document.getElementById('demo-badge').classList.toggle('visible', show);
 }
 
 function setStatusUpdating(updating) {
