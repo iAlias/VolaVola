@@ -1013,7 +1013,9 @@
     <!-- Demo mode badge -->
     <div id="demo-badge" role="status" aria-live="polite">
       <svg class="demo-icon" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
       </svg>
       <span><strong>Modalità Demo</strong> – API non disponibile, dati simulati</span>
     </div>
@@ -1404,6 +1406,7 @@ async function fetchFlights() {
     STATE.hasError = false;
     STATE.isMockData = false;
     STATE.lastUpdate = new Date();
+    // Clear any UI state left over from a previous failed cycle
     showDemoBadge(false);
     showError(false);
 
