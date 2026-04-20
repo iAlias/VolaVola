@@ -295,7 +295,6 @@
        ERROR BANNER
     =========================== */
     #error-banner {
-      display: none;
       position: absolute;
       top: 12px;
       left: 50%;
@@ -1324,8 +1323,8 @@ function altitudeClass(alt, onGround) {
  */
 function aircraftIconHTML(heading, color, selected) {
   const shadow = selected ? `filter:drop-shadow(0 0 6px ${color})` : 'filter:drop-shadow(0 1px 3px rgba(0,0,0,0.6))';
-  return `<div class="aircraft-marker${selected ? ' selected' : ''}" style="transform:rotate(${heading}deg);${shadow}" aria-hidden="true">
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="${color}">
+  return `<div class="aircraft-marker${selected ? ' selected' : ''}" style="transform:rotate(${heading}deg);${shadow}" role="img" aria-label="Aereo">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="${color}" aria-hidden="true">
       <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
     </svg>
   </div>`;
@@ -1628,7 +1627,7 @@ function buildPopupHTML(flight) {
       <div class="popup-compass">
         <div class="compass-ring" title="Direzione di volo: ${heading}°">
           <span class="compass-n">N</span>
-          <div class="compass-needle" style="transform:rotate(${heading}deg) translateX(-50%)"></div>
+          <div class="compass-needle" style="transform:rotate(${heading}deg)"></div>
         </div>
         <div class="popup-stat">
           <div class="popup-stat-label">Heading</div>
@@ -1933,7 +1932,7 @@ function geoLocate() {
     err => {
       console.warn('Geolocalizzazione fallita:', err.message);
       btn.classList.remove('active');
-      // Fallback: centro sulla Sicilia come da specifica
+      // Fallback: centra su un punto centrale nell'area configurata (bounding box Italia)
       map.setView([37.2, 15.2], 9);
     },
     { timeout: 10000 }
