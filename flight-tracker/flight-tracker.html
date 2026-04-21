@@ -903,6 +903,167 @@
     ::-webkit-scrollbar-thumb { background: var(--surface-2); border-radius: 3px; }
 
     /* ===========================
+       SETTINGS MODAL
+    =========================== */
+    #settings-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 3000;
+      background: rgba(0, 0, 0, 0.6);
+      align-items: center;
+      justify-content: center;
+    }
+    #settings-overlay.visible { display: flex; }
+
+    #settings-modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      width: 540px;
+      max-width: calc(100vw - 32px);
+      max-height: calc(100vh - 64px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .settings-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .settings-title {
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .settings-close {
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-muted);
+      border-radius: var(--radius-sm);
+      transition: background 0.15s, color 0.15s;
+    }
+    .settings-close:hover { background: var(--surface-2); color: var(--text); }
+
+    .settings-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .settings-section-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+
+    .provider-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+
+    .provider-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .provider-option:hover { background: var(--surface-2); }
+    .provider-option.selected { border-color: var(--accent); background: rgba(79, 152, 163, 0.08); }
+    .provider-option input[type="radio"] {
+      accent-color: var(--accent);
+      flex-shrink: 0;
+      width: 14px; height: 14px;
+    }
+    .provider-info { flex: 1; min-width: 0; }
+    .provider-name { font-size: 13px; font-weight: 600; color: var(--text); }
+    .provider-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .provider-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 10px;
+      flex-shrink: 0;
+    }
+    .provider-badge.free  { background: rgba(63, 185, 80, 0.15); color: #3fb950; }
+    .provider-badge.paid  { background: rgba(248, 81, 73, 0.15);  color: #f85149; }
+
+    #credentials-section { margin-top: 4px; }
+    .credentials-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+    .credential-group { margin-bottom: 12px; }
+    .credential-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+    }
+    .credential-input {
+      width: 100%;
+      padding: 8px 10px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-size: 13px;
+      font-family: 'JetBrains Mono', monospace;
+      transition: border-color 0.2s;
+    }
+    .credential-input:focus { border-color: var(--accent); outline: none; }
+    .credential-input::placeholder { color: var(--text-muted); font-family: inherit; }
+
+    .settings-footer {
+      padding: 14px 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      flex-shrink: 0;
+    }
+    .settings-save {
+      padding: 8px 18px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .settings-save:hover { background: var(--accent-hover); }
+    .settings-cancel {
+      padding: 8px 18px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .settings-cancel:hover { color: var(--text); border-color: var(--text-muted); }
+
+    /* ===========================
        RESPONSIVE – MOBILE
     =========================== */
     @media (max-width: 768px) {
@@ -966,6 +1127,14 @@
         <circle cx="12" cy="12" r="8" stroke-dasharray="3 2"/>
       </svg>
       <span class="btn-label">Sei qui</span>
+    </button>
+
+    <!-- Settings -->
+    <button id="settings-btn" class="hdr-btn" title="Impostazioni sorgente dati" aria-label="Apri impostazioni sorgente dati">
+      <svg width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
     </button>
 
     <!-- Dark/light toggle -->
@@ -1166,6 +1335,30 @@
     </aside>
 
   </main>
+
+  <!-- ===== SETTINGS MODAL ===== -->
+  <div id="settings-overlay" role="dialog" aria-modal="true" aria-label="Impostazioni sorgente dati">
+    <div id="settings-modal">
+      <div class="settings-header">
+        <span class="settings-title">Impostazioni sorgente dati</span>
+        <button class="settings-close" id="settings-close-btn" aria-label="Chiudi impostazioni">
+          <svg width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="settings-body">
+        <p class="settings-section-title">Sorgente dati voli</p>
+        <div id="provider-list" class="provider-list"></div>
+        <div id="credentials-section"></div>
+      </div>
+      <div class="settings-footer">
+        <button class="settings-cancel" id="settings-cancel-btn">Annulla</button>
+        <button class="settings-save" id="settings-save-btn">Salva e ricarica</button>
+      </div>
+    </div>
+  </div>
+
 </div><!-- app -->
 
 <script>
@@ -1192,13 +1385,18 @@ const CONFIG = {
   NEARBY_RADIUS_KM: 100,
   // Storico recenti
   RECENT_MAX: 10,
-  // OpenSky API endpoint
+  // OpenSky API endpoint (legacy, ora gestito da fetchOpenSky)
   OPENSKY_URL: 'https://opensky-network.org/api/states/all',
   // Mappa iniziale
   MAP_CENTER: [42.5, 12.5],
   MAP_ZOOM: 6,
   MAP_ZOOM_MIN: 3,
   MAP_ZOOM_MAX: 16,
+  // Timeout fetch in ms
+  FETCH_TIMEOUT: 15000,
+  // Sorgente dati attiva e credenziali (caricati da localStorage in loadSettings)
+  provider: 'opensky',
+  credentials: {},
 };
 
 /* ─────────────────────────────────────────────
@@ -1367,57 +1565,537 @@ function aircraftIconHTML(heading, color, selected) {
 }
 
 /* ─────────────────────────────────────────────
-   FETCH DATI OPENSKY
+   DEFINIZIONE PROVIDER
+───────────────────────────────────────────── */
+const PROVIDERS = [
+  {
+    id: 'opensky',
+    name: 'OpenSky Network',
+    type: 'free',
+    desc: 'Nessuna chiave richiesta (aggiornamento ogni 10s)',
+    fields: [
+      { id: 'username', label: 'Username (opzionale)', type: 'text',     placeholder: 'utente opzionale' },
+      { id: 'password', label: 'Password (opzionale)',  type: 'password', placeholder: '••••••••' },
+    ],
+  },
+  {
+    id: 'adsblol',
+    name: 'ADSB.lol',
+    type: 'free',
+    desc: 'Nessuna chiave richiesta, dati ADS-B in tempo reale',
+    fields: [],
+  },
+  {
+    id: 'adsbfi',
+    name: 'adsb.fi',
+    type: 'free',
+    desc: 'Nessuna chiave richiesta, dati ADS-B open source',
+    fields: [],
+  },
+  {
+    id: 'airplaneslive',
+    name: 'airplanes.live',
+    type: 'free',
+    desc: 'Nessuna chiave richiesta, feed ADS-B globale',
+    fields: [],
+  },
+  {
+    id: 'adsbexchange',
+    name: 'ADS-B Exchange',
+    type: 'paid',
+    desc: 'Richiede chiave API RapidAPI',
+    fields: [
+      { id: 'apikey', label: 'RapidAPI Key', type: 'password', placeholder: '••••••••' },
+    ],
+  },
+  {
+    id: 'flightaware',
+    name: 'FlightAware AeroAPI',
+    type: 'paid',
+    desc: 'Richiede AeroAPI Key (piano a pagamento)',
+    fields: [
+      { id: 'apikey', label: 'AeroAPI Key', type: 'password', placeholder: '••••••••' },
+    ],
+  },
+  {
+    id: 'aviationstack',
+    name: 'AviationStack',
+    type: 'paid',
+    desc: 'Richiede Access Key (piano a pagamento)',
+    fields: [
+      { id: 'apikey', label: 'Access Key', type: 'password', placeholder: '••••••••' },
+    ],
+  },
+  {
+    id: 'aerodatabox',
+    name: 'AeroDataBox',
+    type: 'paid',
+    desc: 'Richiede chiave API RapidAPI',
+    fields: [
+      { id: 'apikey', label: 'RapidAPI Key', type: 'password', placeholder: '••••••••' },
+    ],
+  },
+  {
+    id: 'airlabs',
+    name: 'AirLabs',
+    type: 'paid',
+    desc: 'Richiede API Key (piano a pagamento)',
+    fields: [
+      { id: 'apikey', label: 'API Key', type: 'password', placeholder: '••••••••' },
+    ],
+  },
+  {
+    id: 'aviationedge',
+    name: 'Aviation Edge',
+    type: 'paid',
+    desc: 'Richiede API Key (piano a pagamento)',
+    fields: [
+      { id: 'apikey', label: 'API Key', type: 'password', placeholder: '••••••••' },
+    ],
+  },
+];
+
+/* ─────────────────────────────────────────────
+   IMPOSTAZIONI (localStorage)
+───────────────────────────────────────────── */
+function loadSettings() {
+  try {
+    const raw = localStorage.getItem('flighttrack_settings');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed.provider) CONFIG.provider = parsed.provider;
+      if (parsed.credentials) CONFIG.credentials = parsed.credentials;
+    }
+  } catch (e) {
+    console.warn('Settings load error:', e);
+  }
+}
+
+function saveSettings(provider, credentials) {
+  try {
+    CONFIG.provider = provider;
+    CONFIG.credentials = credentials;
+    localStorage.setItem('flighttrack_settings', JSON.stringify({ provider, credentials }));
+  } catch (e) {
+    console.warn('Settings save error:', e);
+  }
+}
+
+/* ─────────────────────────────────────────────
+   HELPER: BBOX → CENTRO + RAGGIO (nm)
+───────────────────────────────────────────── */
+// Conversioni unità
+const FT_TO_M    = 0.3048;     // piedi → metri
+const KNOTS_TO_MS = 0.514444;  // nodi → m/s
+const KMH_TO_MS  = 1 / 3.6;   // km/h → m/s
+const FPM_TO_MS  = 0.00508;    // ft/min → m/s
+const KM_TO_NM   = 1 / 1.852; // km → miglia nautiche
+const MAX_RADIUS_NM = 250;     // raggio massimo supportato dalle API ADS-B
+
+function bboxCenter() {
+  const { lamin, lamax, lomin, lomax } = CONFIG.BBOX;
+  return { lat: (lamin + lamax) / 2, lon: (lomin + lomax) / 2 };
+}
+
+function bboxRadiusNm() {
+  const { lamin, lamax, lomin, lomax } = CONFIG.BBOX;
+  const clat = (lamin + lamax) / 2;
+  const clon = (lomin + lomax) / 2;
+  const toRad = d => d * Math.PI / 180;
+  const dlat = toRad(lamax - clat);
+  const dlon = toRad(lomax - clon);
+  const a = Math.sin(dlat) ** 2 +
+    Math.cos(toRad(clat)) * Math.cos(toRad(lamax)) * Math.sin(dlon) ** 2;
+  const km = 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return Math.min(Math.ceil(km * KM_TO_NM), MAX_RADIUS_NM);
+}
+
+function inBbox(lat, lon) {
+  const { lamin, lamax, lomin, lomax } = CONFIG.BBOX;
+  return lat >= lamin && lat <= lamax && lon >= lomin && lon <= lomax;
+}
+
+/* ─────────────────────────────────────────────
+   NORMALIZZAZIONE FORMATO ADS-B
+   (usato da ADSB.lol, adsb.fi, airplanes.live, ADS-B Exchange)
+───────────────────────────────────────────── */
+function normalizeAdsbStyle(ac) {
+  const onGround = ac.alt_baro === 'ground' || ac.on_ground === true;
+  const altFt = onGround ? 0 : (parseFloat(ac.alt_baro) || 0);
+  const altM = altFt * FT_TO_M;
+  const speedMs = (parseFloat(ac.gs) || 0) * KNOTS_TO_MS;
+  const vRateMs = (parseFloat(ac.baro_rate) || 0) * FPM_TO_MS;
+  const now = Date.now() / 1000;
+  return [
+    (ac.hex || '').toLowerCase().trim(),
+    (ac.flight || '').trim(),
+    '',
+    now, now,
+    parseFloat(ac.lon) || null,
+    parseFloat(ac.lat) || null,
+    onGround ? 0 : altM,
+    onGround,
+    speedMs,
+    parseFloat(ac.track) || 0,
+    vRateMs,
+    null, altM, ac.squawk || null, false, 0,
+  ];
+}
+
+/* ─────────────────────────────────────────────
+   FETCH: OpenSky Network
+───────────────────────────────────────────── */
+async function fetchOpenSky(signal) {
+  const { lamin, lamax, lomin, lomax } = CONFIG.BBOX;
+  const url = `https://opensky-network.org/api/states/all?lamin=${lamin}&lamax=${lamax}&lomin=${lomin}&lomax=${lomax}`;
+  const headers = { Accept: 'application/json' };
+  const creds = CONFIG.credentials.opensky || {};
+  if (creds.username && creds.password) {
+    headers.Authorization = 'Basic ' + btoa(`${creds.username}:${creds.password}`);
+  }
+  const res = await fetch(url, { signal, headers });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data = await res.json();
+  return (data.states || []).slice(0, CONFIG.MAX_FLIGHTS);
+}
+
+/* ─────────────────────────────────────────────
+   FETCH: ADSB.lol
+───────────────────────────────────────────── */
+async function fetchAdsbLol(signal) {
+  const { lat, lon } = bboxCenter();
+  const dist = bboxRadiusNm();
+  const url = `https://api.adsb.lol/v2/lat/${lat}/lon/${lon}/dist/${dist}`;
+  const res = await fetch(url, { signal, headers: { Accept: 'application/json' } });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data = await res.json();
+  return (data.ac || [])
+    .map(normalizeAdsbStyle)
+    .filter(s => s[6] && s[5] && inBbox(s[6], s[5]))
+    .slice(0, CONFIG.MAX_FLIGHTS);
+}
+
+/* ─────────────────────────────────────────────
+   FETCH: adsb.fi
+───────────────────────────────────────────── */
+async function fetchAdsbFi(signal) {
+  const { lat, lon } = bboxCenter();
+  const dist = bboxRadiusNm();
+  const url = `https://opendata.adsb.fi/api/v2/lat/${lat}/lon/${lon}/dist/${dist}`;
+  const res = await fetch(url, { signal, headers: { Accept: 'application/json' } });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data = await res.json();
+  return (data.ac || [])
+    .map(normalizeAdsbStyle)
+    .filter(s => s[6] && s[5] && inBbox(s[6], s[5]))
+    .slice(0, CONFIG.MAX_FLIGHTS);
+}
+
+/* ─────────────────────────────────────────────
+   FETCH: airplanes.live
+───────────────────────────────────────────── */
+async function fetchAirplanesLive(signal) {
+  const { lat, lon } = bboxCenter();
+  const dist = bboxRadiusNm();
+  const url = `https://api.airplanes.live/v2/point/${lat}/${lon}/${dist}`;
+  const res = await fetch(url, { signal, headers: { Accept: 'application/json' } });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data = await res.json();
+  return (data.ac || [])
+    .map(normalizeAdsbStyle)
+    .filter(s => s[6] && s[5] && inBbox(s[6], s[5]))
+    .slice(0, CONFIG.MAX_FLIGHTS);
+}
+
+/* ─────────────────────────────────────────────
+   FETCH: ADS-B Exchange (via RapidAPI)
+───────────────────────────────────────────── */
+async function fetchAdsbExchange(signal) {
+  const creds = CONFIG.credentials.adsbexchange || {};
+  if (!creds.apikey) throw new Error('Chiave API non configurata');
+  const { lat, lon } = bboxCenter();
+  const dist = bboxRadiusNm();
+  const url = `https://adsbexchange-com1.p.rapidapi.com/v2/lat/${lat}/lon/${lon}/dist/${dist}/`;
+  const res = await fetch(url, {
+    signal,
+    headers: {
+      Accept: 'application/json',
+      'x-rapidapi-key': creds.apikey,
+      'x-rapidapi-host': 'adsbexchange-com1.p.rapidapi.com',
+    },
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data = await res.json();
+  return (data.ac || [])
+    .map(normalizeAdsbStyle)
+    .filter(s => s[6] && s[5] && inBbox(s[6], s[5]))
+    .slice(0, CONFIG.MAX_FLIGHTS);
+}
+
+/* ─────────────────────────────────────────────
+   FETCH: FlightAware AeroAPI
+───────────────────────────────────────────── */
+async function fetchFlightAware(signal) {
+  const creds = CONFIG.credentials.flightaware || {};
+  if (!creds.apikey) throw new Error('Chiave API non configurata');
+  const { lamin, lamax, lomin, lomax } = CONFIG.BBOX;
+  const query = encodeURIComponent(`-latlong "${lamin} ${lomin} ${lamax} ${lomax}"`);
+  const url = `https://aeroapi.flightaware.com/aeroapi/flights/search?query=${query}&max_pages=5`;
+  const res = await fetch(url, {
+    signal,
+    headers: { Accept: 'application/json', 'x-apikey': creds.apikey },
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data = await res.json();
+  const now = Date.now() / 1000;
+  return (data.flights || [])
+    .filter(f => f.last_position && f.last_position.latitude && f.last_position.longitude)
+    .map(f => {
+      const p = f.last_position;
+      const altM = (p.altitude || 0) * 100 * FT_TO_M;
+      const speedMs = (p.groundspeed || 0) * KNOTS_TO_MS;
+      const onGround = p.altitude === 0 || f.status === 'Landed';
+      return [
+        (f.registration || f.ident_icao || '').toLowerCase().trim(),
+        (f.ident || '').trim(),
+        '',
+        now, now,
+        p.longitude,
+        p.latitude,
+        onGround ? 0 : altM,
+        !!onGround,
+        speedMs,
+        p.heading || 0,
+        0,
+        null, altM, null, false, 0,
+      ];
+    })
+    .filter(s => s[6] && s[5] && inBbox(s[6], s[5]))
+    .slice(0, CONFIG.MAX_FLIGHTS);
+}
+
+/* ─────────────────────────────────────────────
+   FETCH: AviationStack
+───────────────────────────────────────────── */
+async function fetchAviationStack(signal) {
+  const creds = CONFIG.credentials.aviationstack || {};
+  if (!creds.apikey) throw new Error('Chiave API non configurata');
+  const url = `https://api.aviationstack.com/v1/flights?access_key=${encodeURIComponent(creds.apikey)}&flight_status=active&limit=100`;
+  const res = await fetch(url, { signal, headers: { Accept: 'application/json' } });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.info || 'Errore API AviationStack');
+  const now = Date.now() / 1000;
+  return (data.data || [])
+    .filter(f => f.live && f.live.latitude && f.live.longitude)
+    .map(f => {
+      const live = f.live;
+      const altM = (live.altitude || 0) * FT_TO_M;
+      const speedMs = (live.speed_horizontal || 0) * KMH_TO_MS;
+      const vRateMs = (live.speed_vertical || 0) * FPM_TO_MS;
+      const onGround = !!live.is_ground;
+      return [
+        (f.aircraft && f.aircraft.icao24 || '').toLowerCase().trim(),
+        (f.flight && (f.flight.icao || f.flight.iata) || '').trim(),
+        (f.airline && f.airline.name || ''),
+        now, now,
+        live.longitude,
+        live.latitude,
+        onGround ? 0 : altM,
+        onGround,
+        speedMs,
+        live.direction || 0,
+        vRateMs,
+        null, altM, null, false, 0,
+      ];
+    })
+    .filter(s => s[6] && s[5] && inBbox(s[6], s[5]))
+    .slice(0, CONFIG.MAX_FLIGHTS);
+}
+
+/* ─────────────────────────────────────────────
+   FETCH: AeroDataBox (via RapidAPI)
+───────────────────────────────────────────── */
+async function fetchAeroDataBox(signal) {
+  const creds = CONFIG.credentials.aerodatabox || {};
+  if (!creds.apikey) throw new Error('Chiave API non configurata');
+  const { lamin, lamax, lomin, lomax } = CONFIG.BBOX;
+  const url = `https://aerodatabox.p.rapidapi.com/flights/airports/icao/box?latTop=${lamax}&latBottom=${lamin}&lonLeft=${lomin}&lonRight=${lomax}`;
+  const res = await fetch(url, {
+    signal,
+    headers: {
+      Accept: 'application/json',
+      'x-rapidapi-key': creds.apikey,
+      'x-rapidapi-host': 'aerodatabox.p.rapidapi.com',
+    },
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data = await res.json();
+  const now = Date.now() / 1000;
+  const flights = Array.isArray(data) ? data
+    : [...(data.departures || []), ...(data.arrivals || [])];
+  return flights
+    .filter(f => f.location && f.location.lat && f.location.lon)
+    .map(f => {
+      const altM = (f.altitude || 0) * FT_TO_M;
+      const speedMs = (f.groundSpeed || 0) * KNOTS_TO_MS;
+      const onGround = !!f.isGround;
+      return [
+        (f.reg || f.icao24 || '').toLowerCase().trim(),
+        (f.callsign || (f.number && f.number.callsign) || '').trim(),
+        '',
+        now, now,
+        f.location.lon,
+        f.location.lat,
+        onGround ? 0 : altM,
+        onGround,
+        speedMs,
+        f.heading || 0,
+        0,
+        null, altM, null, false, 0,
+      ];
+    })
+    .filter(s => s[6] && s[5] && inBbox(s[6], s[5]))
+    .slice(0, CONFIG.MAX_FLIGHTS);
+}
+
+/* ─────────────────────────────────────────────
+   FETCH: AirLabs
+───────────────────────────────────────────── */
+async function fetchAirLabs(signal) {
+  const creds = CONFIG.credentials.airlabs || {};
+  if (!creds.apikey) throw new Error('Chiave API non configurata');
+  const url = `https://airlabs.co/api/v9/flights?api_key=${encodeURIComponent(creds.apikey)}`;
+  const res = await fetch(url, { signal, headers: { Accept: 'application/json' } });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message || 'Errore API AirLabs');
+  const now = Date.now() / 1000;
+  return (data.response || [])
+    .filter(f => f.lat && f.lng)
+    .map(f => {
+      const altM = parseFloat(f.alt) || 0;
+      const speedMs = (parseFloat(f.speed) || 0) * KMH_TO_MS;
+      const vRateMs = (parseFloat(f.v_speed) || 0) * FPM_TO_MS;
+      const onGround = altM === 0;
+      return [
+        (f.hex || '').toLowerCase().trim(),
+        (f.flight_icao || f.flight_iata || '').trim(),
+        f.flag || '',
+        now, now,
+        parseFloat(f.lng),
+        parseFloat(f.lat),
+        onGround ? 0 : altM,
+        onGround,
+        speedMs,
+        parseFloat(f.dir) || 0,
+        vRateMs,
+        null, altM, null, false, 0,
+      ];
+    })
+    .filter(s => s[6] && s[5] && inBbox(s[6], s[5]))
+    .slice(0, CONFIG.MAX_FLIGHTS);
+}
+
+/* ─────────────────────────────────────────────
+   FETCH: Aviation Edge
+───────────────────────────────────────────── */
+async function fetchAviationEdge(signal) {
+  const creds = CONFIG.credentials.aviationedge || {};
+  if (!creds.apikey) throw new Error('Chiave API non configurata');
+  const url = `https://aviation-edge.com/v2/public/flights?key=${encodeURIComponent(creds.apikey)}&status=en-route`;
+  const res = await fetch(url, { signal, headers: { Accept: 'application/json' } });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data = await res.json();
+  if (!Array.isArray(data)) {
+    if (data.error) throw new Error(data.error.text || 'Errore API Aviation Edge');
+    return [];
+  }
+  const now = Date.now() / 1000;
+  return data
+    .filter(f => f.geography && f.geography.latitude && f.geography.longitude)
+    .map(f => {
+      const geo = f.geography;
+      const spd = f.speed || {};
+      const altM = (parseFloat(geo.altitude) || 0) * FT_TO_M;
+      const speedMs = (parseFloat(spd.horizontal) || 0) * KMH_TO_MS;
+      const vRateMs = (parseFloat(spd.vertical) || 0) * FPM_TO_MS;
+      const onGround = !!spd.isGround;
+      const aircraft = f.aircraft || {};
+      const flight = f.flight || {};
+      return [
+        (aircraft.icao24 || '').toLowerCase().trim(),
+        (flight.icaoNumber || flight.iataNumber || '').trim(),
+        '',
+        now, now,
+        parseFloat(geo.longitude),
+        parseFloat(geo.latitude),
+        onGround ? 0 : altM,
+        onGround,
+        speedMs,
+        parseFloat(geo.direction) || 0,
+        vRateMs,
+        null, altM, null, false, 0,
+      ];
+    })
+    .filter(s => s[6] && s[5] && inBbox(s[6], s[5]))
+    .slice(0, CONFIG.MAX_FLIGHTS);
+}
+
+/* ─────────────────────────────────────────────
+   FETCH DATI VOLI (dispatcher)
 ───────────────────────────────────────────── */
 /**
- * Recupera i dati dei voli dall'API OpenSky Network.
+ * Recupera i dati dei voli dal provider selezionato.
  * In caso di errore, usa i dati mock come fallback.
  */
 async function fetchFlights() {
   setStatusUpdating(true);
   showError(false);
 
-  const { lamin, lamax, lomin, lomax } = CONFIG.BBOX;
-  const url = `${CONFIG.OPENSKY_URL}?lamin=${lamin}&lamax=${lamax}&lomin=${lomin}&lomax=${lomax}`;
+  const provider = CONFIG.provider || 'opensky';
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), CONFIG.FETCH_TIMEOUT);
 
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15000);
-
-    const response = await fetch(url, {
-      signal: controller.signal,
-      headers: { 'Accept': 'application/json' },
-    });
+    let states;
+    switch (provider) {
+      case 'opensky':       states = await fetchOpenSky(controller.signal);      break;
+      case 'adsblol':       states = await fetchAdsbLol(controller.signal);      break;
+      case 'adsbfi':        states = await fetchAdsbFi(controller.signal);       break;
+      case 'airplaneslive': states = await fetchAirplanesLive(controller.signal); break;
+      case 'adsbexchange':  states = await fetchAdsbExchange(controller.signal); break;
+      case 'flightaware':   states = await fetchFlightAware(controller.signal);  break;
+      case 'aviationstack': states = await fetchAviationStack(controller.signal); break;
+      case 'aerodatabox':   states = await fetchAeroDataBox(controller.signal);  break;
+      case 'airlabs':       states = await fetchAirLabs(controller.signal);      break;
+      case 'aviationedge':  states = await fetchAviationEdge(controller.signal); break;
+      default:              states = await fetchOpenSky(controller.signal);
+    }
     clearTimeout(timeout);
 
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-    const data = await response.json();
-    const states = data.states || [];
-
-    if (states.length === 0) {
-      // API ok ma nessun dato → usa mock per demo
-      console.warn('OpenSky: nessun dato disponibile, uso mock');
+    if (!states || states.length === 0) {
+      console.warn(`${provider}: nessun dato disponibile, uso mock`);
       STATE.allFlights = generateMockFlights();
+      STATE.isMockData = true;
+      showDemoBadge(true);
     } else {
-      STATE.allFlights = states.slice(0, CONFIG.MAX_FLIGHTS);
+      STATE.allFlights = states;
+      STATE.isMockData = false;
+      showDemoBadge(false);
     }
 
     STATE.hasError = false;
-    STATE.isMockData = false;
     STATE.lastUpdate = new Date();
-    // Clear any UI state left over from a previous failed cycle
-    showDemoBadge(false);
     showError(false);
 
   } catch (err) {
+    clearTimeout(timeout);
     if (err.name === 'AbortError') {
-      console.warn('OpenSky: timeout, uso dati mock');
+      console.warn(`${provider}: timeout, uso dati mock`);
     } else {
-      console.warn('OpenSky: errore fetch, uso dati mock', err.message);
+      console.warn(`${provider}: errore fetch, uso dati mock –`, err.message);
     }
-
-    // Se è il primo caricamento, usa sempre mock
     if (STATE.allFlights.length === 0) {
       STATE.allFlights = generateMockFlights();
     }
@@ -2240,14 +2918,152 @@ function resetFilters() {
 }
 
 /* ─────────────────────────────────────────────
+   SETTINGS MODAL
+───────────────────────────────────────────── */
+let _settingsTempProvider = null;
+let _settingsTempCreds = {};
+
+function openSettings() {
+  _settingsTempProvider = CONFIG.provider || 'opensky';
+  _settingsTempCreds = structuredClone(CONFIG.credentials || {});
+  renderProviderList();
+  renderCredentials(_settingsTempProvider);
+  document.getElementById('settings-overlay').classList.add('visible');
+}
+
+function closeSettings() {
+  document.getElementById('settings-overlay').classList.remove('visible');
+}
+
+function renderProviderList() {
+  const container = document.getElementById('provider-list');
+  container.innerHTML = '';
+  PROVIDERS.forEach(p => {
+    const label = document.createElement('label');
+    label.className = 'provider-option' + (p.id === _settingsTempProvider ? ' selected' : '');
+    label.setAttribute('for', `prov-${p.id}`);
+
+    const radio = document.createElement('input');
+    radio.type = 'radio';
+    radio.id = `prov-${p.id}`;
+    radio.name = 'provider';
+    radio.value = p.id;
+    radio.checked = p.id === _settingsTempProvider;
+
+    const info = document.createElement('div');
+    info.className = 'provider-info';
+    const nameEl = document.createElement('div');
+    nameEl.className = 'provider-name';
+    nameEl.textContent = p.name;
+    const descEl = document.createElement('div');
+    descEl.className = 'provider-desc';
+    descEl.textContent = p.desc;
+    info.appendChild(nameEl);
+    info.appendChild(descEl);
+
+    const badge = document.createElement('span');
+    badge.className = `provider-badge ${p.type}`;
+    badge.textContent = p.type === 'free' ? 'Gratuito' : 'A pagamento';
+
+    label.appendChild(radio);
+    label.appendChild(info);
+    label.appendChild(badge);
+
+    radio.addEventListener('change', () => {
+      _settingsTempProvider = p.id;
+      container.querySelectorAll('.provider-option').forEach(el => el.classList.remove('selected'));
+      label.classList.add('selected');
+      renderCredentials(p.id);
+    });
+
+    container.appendChild(label);
+  });
+}
+
+function renderCredentials(providerId) {
+  const container = document.getElementById('credentials-section');
+  const prov = PROVIDERS.find(p => p.id === providerId);
+  if (!prov || prov.fields.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+  if (!_settingsTempCreds[providerId]) _settingsTempCreds[providerId] = {};
+
+  const title = document.createElement('p');
+  title.className = 'credentials-title';
+  title.textContent = `Credenziali – ${prov.name}`;
+  container.innerHTML = '';
+  container.appendChild(title);
+
+  prov.fields.forEach(f => {
+    const group = document.createElement('div');
+    group.className = 'credential-group';
+
+    const lbl = document.createElement('label');
+    lbl.className = 'credential-label';
+    lbl.setAttribute('for', `cred-${providerId}-${f.id}`);
+    lbl.textContent = f.label;
+
+    const inp = document.createElement('input');
+    inp.className = 'credential-input';
+    inp.type = f.type;
+    inp.id = `cred-${providerId}-${f.id}`;
+    inp.placeholder = f.placeholder;
+    inp.autocomplete = 'off';
+    inp.value = (_settingsTempCreds[providerId] && _settingsTempCreds[providerId][f.id]) || '';
+
+    inp.addEventListener('input', () => {
+      if (!_settingsTempCreds[providerId]) _settingsTempCreds[providerId] = {};
+      _settingsTempCreds[providerId][f.id] = inp.value;
+    });
+
+    group.appendChild(lbl);
+    group.appendChild(inp);
+    container.appendChild(group);
+  });
+}
+
+function initSettingsEvents() {
+  document.getElementById('settings-btn').addEventListener('click', openSettings);
+  document.getElementById('settings-close-btn').addEventListener('click', closeSettings);
+  document.getElementById('settings-cancel-btn').addEventListener('click', closeSettings);
+
+  document.getElementById('settings-overlay').addEventListener('click', e => {
+    if (e.target === document.getElementById('settings-overlay')) closeSettings();
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && document.getElementById('settings-overlay').classList.contains('visible')) {
+      closeSettings();
+    }
+  });
+
+  document.getElementById('settings-save-btn').addEventListener('click', () => {
+    saveSettings(_settingsTempProvider, _settingsTempCreds);
+    closeSettings();
+    // Riavvia il ciclo con il nuovo provider
+    if (STATE.updateTimer) clearInterval(STATE.updateTimer);
+    STATE.allFlights = [];
+    STATE.isMockData = false;
+    STATE.isLoading = true;
+    const overlay = document.getElementById('loading-overlay');
+    overlay.style.display = '';
+    overlay.classList.remove('hidden');
+    updateCycle().then(() => startUpdateTimer());
+  });
+}
+
+/* ─────────────────────────────────────────────
    INIT
 ───────────────────────────────────────────── */
 /**
  * Punto di ingresso principale: inizializza mappa, eventi e avvia il ciclo.
  */
 async function init() {
+  loadSettings();
   initMap();
   initEvents();
+  initSettingsEvents();
   await updateCycle();
   startUpdateTimer();
 }
