@@ -1392,6 +1392,8 @@ const CONFIG = {
   MAP_ZOOM: 6,
   MAP_ZOOM_MIN: 3,
   MAP_ZOOM_MAX: 16,
+  // Timeout fetch in ms
+  FETCH_TIMEOUT: 15000,
   // Sorgente dati attiva e credenziali (caricati da localStorage in loadSettings)
   provider: 'opensky',
   credentials: {},
@@ -1682,6 +1684,14 @@ function saveSettings(provider, credentials) {
 /* ─────────────────────────────────────────────
    HELPER: BBOX → CENTRO + RAGGIO (nm)
 ───────────────────────────────────────────── */
+// Conversioni unità
+const FT_TO_M    = 0.3048;     // piedi → metri
+const KNOTS_TO_MS = 0.514444;  // nodi → m/s
+const KMH_TO_MS  = 1 / 3.6;   // km/h → m/s
+const FPM_TO_MS  = 0.00508;    // ft/min → m/s
+const KM_TO_NM   = 1 / 1.852; // km → miglia nautiche
+const MAX_RADIUS_NM = 250;     // raggio massimo supportato dalle API ADS-B
+
 function bboxCenter() {
   const { lamin, lamax, lomin, lomax } = CONFIG.BBOX;
   return { lat: (lamin + lamax) / 2, lon: (lomin + lomax) / 2 };
@@ -1697,7 +1707,7 @@ function bboxRadiusNm() {
   const a = Math.sin(dlat) ** 2 +
     Math.cos(toRad(clat)) * Math.cos(toRad(lamax)) * Math.sin(dlon) ** 2;
   const km = 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return Math.min(Math.ceil(km / 1.852), 250);
+  return Math.min(Math.ceil(km * KM_TO_NM), MAX_RADIUS_NM);
 }
 
 function inBbox(lat, lon) {
@@ -1712,9 +1722,9 @@ function inBbox(lat, lon) {
 function normalizeAdsbStyle(ac) {
   const onGround = ac.alt_baro === 'ground' || ac.on_ground === true;
   const altFt = onGround ? 0 : (parseFloat(ac.alt_baro) || 0);
-  const altM = altFt * 0.3048;
-  const speedMs = (parseFloat(ac.gs) || 0) * 0.51444;
-  const vRateMs = (parseFloat(ac.baro_rate) || 0) * 0.00508;
+  const altM = altFt * FT_TO_M;
+  const speedMs = (parseFloat(ac.gs) || 0) * KNOTS_TO_MS;
+  const vRateMs = (parseFloat(ac.baro_rate) || 0) * FPM_TO_MS;
   const now = Date.now() / 1000;
   return [
     (ac.hex || '').toLowerCase().trim(),
@@ -1842,8 +1852,8 @@ async function fetchFlightAware(signal) {
     .filter(f => f.last_position && f.last_position.latitude && f.last_position.longitude)
     .map(f => {
       const p = f.last_position;
-      const altM = (p.altitude || 0) * 100 * 0.3048;
-      const speedMs = (p.groundspeed || 0) * 0.51444;
+      const altM = (p.altitude || 0) * 100 * FT_TO_M;
+      const speedMs = (p.groundspeed || 0) * KNOTS_TO_MS;
       const onGround = p.altitude === 0 || f.status === 'Landed';
       return [
         (f.registration || f.ident_icao || '').toLowerCase().trim(),
@@ -1880,9 +1890,9 @@ async function fetchAviationStack(signal) {
     .filter(f => f.live && f.live.latitude && f.live.longitude)
     .map(f => {
       const live = f.live;
-      const altM = (live.altitude || 0) * 0.3048;
-      const speedMs = (live.speed_horizontal || 0) / 3.6;
-      const vRateMs = (live.speed_vertical || 0) / 196.85;
+      const altM = (live.altitude || 0) * FT_TO_M;
+      const speedMs = (live.speed_horizontal || 0) * KMH_TO_MS;
+      const vRateMs = (live.speed_vertical || 0) * FPM_TO_MS;
       const onGround = !!live.is_ground;
       return [
         (f.aircraft && f.aircraft.icao24 || '').toLowerCase().trim(),
@@ -1927,8 +1937,8 @@ async function fetchAeroDataBox(signal) {
   return flights
     .filter(f => f.location && f.location.lat && f.location.lon)
     .map(f => {
-      const altM = (f.altitude || 0) * 0.3048;
-      const speedMs = (f.groundSpeed || 0) * 0.51444;
+      const altM = (f.altitude || 0) * FT_TO_M;
+      const speedMs = (f.groundSpeed || 0) * KNOTS_TO_MS;
       const onGround = !!f.isGround;
       return [
         (f.reg || f.icao24 || '').toLowerCase().trim(),
@@ -1965,8 +1975,8 @@ async function fetchAirLabs(signal) {
     .filter(f => f.lat && f.lng)
     .map(f => {
       const altM = parseFloat(f.alt) || 0;
-      const speedMs = (parseFloat(f.speed) || 0) / 3.6;
-      const vRateMs = (parseFloat(f.v_speed) || 0) / 196.85;
+      const speedMs = (parseFloat(f.speed) || 0) * KMH_TO_MS;
+      const vRateMs = (parseFloat(f.v_speed) || 0) * FPM_TO_MS;
       const onGround = altM === 0;
       return [
         (f.hex || '').toLowerCase().trim(),
@@ -2007,9 +2017,9 @@ async function fetchAviationEdge(signal) {
     .map(f => {
       const geo = f.geography;
       const spd = f.speed || {};
-      const altM = (parseFloat(geo.altitude) || 0) * 0.3048;
-      const speedMs = (parseFloat(spd.horizontal) || 0) / 3.6;
-      const vRateMs = (parseFloat(spd.vertical) || 0) / 196.85;
+      const altM = (parseFloat(geo.altitude) || 0) * FT_TO_M;
+      const speedMs = (parseFloat(spd.horizontal) || 0) * KMH_TO_MS;
+      const vRateMs = (parseFloat(spd.vertical) || 0) * FPM_TO_MS;
       const onGround = !!spd.isGround;
       const aircraft = f.aircraft || {};
       const flight = f.flight || {};
@@ -2045,7 +2055,7 @@ async function fetchFlights() {
 
   const provider = CONFIG.provider || 'opensky';
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 15000);
+  const timeout = setTimeout(() => controller.abort(), CONFIG.FETCH_TIMEOUT);
 
   try {
     let states;
@@ -2915,7 +2925,7 @@ let _settingsTempCreds = {};
 
 function openSettings() {
   _settingsTempProvider = CONFIG.provider || 'opensky';
-  _settingsTempCreds = JSON.parse(JSON.stringify(CONFIG.credentials || {}));
+  _settingsTempCreds = structuredClone(CONFIG.credentials || {});
   renderProviderList();
   renderCredentials(_settingsTempProvider);
   document.getElementById('settings-overlay').classList.add('visible');
@@ -2942,7 +2952,14 @@ function renderProviderList() {
 
     const info = document.createElement('div');
     info.className = 'provider-info';
-    info.innerHTML = `<div class="provider-name">${p.name}</div><div class="provider-desc">${p.desc}</div>`;
+    const nameEl = document.createElement('div');
+    nameEl.className = 'provider-name';
+    nameEl.textContent = p.name;
+    const descEl = document.createElement('div');
+    descEl.className = 'provider-desc';
+    descEl.textContent = p.desc;
+    info.appendChild(nameEl);
+    info.appendChild(descEl);
 
     const badge = document.createElement('span');
     badge.className = `provider-badge ${p.type}`;
